@@ -1,5 +1,18 @@
 # Dynamodb Data modelling: Target stores (WIP)
 
+Data modelling demo with DynamoDB using terraform for infrastructure management.
+
+
+## Table Of Contents:
+
+- [Introduction](#Introdiction)
+- [Quick Start](#quick-start)
+- [Analyze Data](#design-analyze---data)
+- [DynamoDB Indexes](#design-dynamodb---indexes)
+- [Data Transformation](#design-data---transformation)
+
+## Introduction
+
 Design an efficient dynamodb with the data and the provided access patterns.
 
 Please note this is work in process.
@@ -14,12 +27,12 @@ Please note this is work in process.
 - Given state and city, return all attributes for all stores (State: WA; City: Seattle).
 - Given state city and zip, return all attributes for all stores (State: WA; City: Seattle; Zip: 98125).
 
-#### Table Of Contents:
+**Core Concepts:**
 
-- [Quick Start](#quick-start)
-- [Analyze Data](#design-analyze---data)
-- [DynamoDB Indexes](#design-dynamodb---indexes)
-- [Data Transformation](#design-data---transformation)
+- Leverage AWS DynamoDB GSI / LSI
+- Leverage AWS Querying 
+- DynamoDB Design with GSI Sparse indexes
+- DynamoDB Design with GSI Composite keys  
 
 ## Quick Start
 
