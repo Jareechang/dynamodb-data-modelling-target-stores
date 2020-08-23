@@ -91,6 +91,9 @@ Index Type | PK | SK| Projections |
 
 **AWS CLI query:**
 ```sh
+# Change the --endpoint-url if using a different environment
+# Note: Remove the --select "Count" if you like to see all projections from DB
+
 aws dynamodb query \
 --endpoint-url "http://localhost:8000/" \
 --table-name Store \
@@ -141,7 +144,6 @@ Index Type | PK | SK| Projections |
 
 ```sh
 # Change the --endpoint-url if using a different environment
-
 # Note: Remove the --select "Count" if you like to see all projections from DB
 
 aws dynamodb query \
