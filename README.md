@@ -17,11 +17,17 @@ Please note this is work in process.
 #### Contents:
 
 - [Quick Start](#quick-start)
-- [Analyze Data](#design-analyze-data)
-- [DynamoDB Indexes](#design-dynamodb-indexes)
-- [Data Transformation](#design-data-transformation)
+- [Analyze Data](#design-analyze---data)
+- [DynamoDB Indexes](#design-dynamodb---indexes)
+- [Data Transformation](#design-data---transformation)
 
 ## Quick Start
+
+**Technologies:**
+
+- AWS DynamoDB
+- Terraform (>= v0.12.24)
+- Python / Typescript
 
 1. Start local DynamoDB & Create Table(for local testing)  
 
