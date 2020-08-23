@@ -33,7 +33,7 @@ docker compose up
 aws dynamodb create-table \
     --endpoint-url "http://localhost:8000/" \
     --table-name Store \
-    --attribute-definitions AttributeName=ID,AttributeType=S AttributeName=Address.Subdivision,AttributeType=S \
+    --attribute-definitions AttributeName=N,AttributeType=S AttributeName=Address.Subdivision,AttributeType=S \
     --key-schema AttributeName=Address.Subdivision,KeyType=HASH AttributeName=ID,KeyType=RANGE \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
 ```

@@ -16,8 +16,6 @@ class DynamoDBWrapper {
         items: any 
     ): Promise<any> {
         const putRequests = items.map((item: any) : any => {
-            // Patch ID as it must be a string
-            item["ID"] = String(item["ID"]);
             return this.generatePutRequest(AWS.DynamoDB.Converter.marshall(item));
         });
         const batchWriteParams = {
@@ -39,7 +37,6 @@ class DynamoDBWrapper {
         }
     }
 }
-
 
 async function main() {
     const rawData = await fs.promises.readFile('./ddb-inserts.json', 'utf8');
