@@ -76,9 +76,9 @@ resource "aws_dynamodb_table" "target_store" {
 
     # Query by store ID - Given ID, return all attributes for store (ID: 1957)
     global_secondary_index {
-        name               = "Query-By-Store-ID"
-        hash_key           = "ID"
-        range_key          = "Address.Subdivision"
+        name               = "Query-By-Store-State"
+        hash_key           = "Address.Subdivision"
+        range_key          = "ID"
         write_capacity     = local.ddb_default_write_cap
         read_capacity      = local.ddb_default_read_cap
         projection_type    = "ALL"
