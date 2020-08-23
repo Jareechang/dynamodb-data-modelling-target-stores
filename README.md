@@ -2,6 +2,7 @@
 
 Data modelling demo with DynamoDB using terraform for infrastructure management.
 
+This demostration goes from the raw data to designing and planning a DyanmoDB store for the given access patterns provided.
 
 ## Table Of Contents:
 
@@ -10,6 +11,7 @@ Data modelling demo with DynamoDB using terraform for infrastructure management.
 - [Analyze Data](#design---analyze-data)
 - [DynamoDB Indexes](#design---dynamodb-indexes)
 - [Data Transformation](#design---data-transformation)
+- [Optimization](#) TODO
 
 ## Introduction
 
