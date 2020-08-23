@@ -1,0 +1,9 @@
+setup-env.sh
+setup-dev.sh
+dist
+terraform.tfstate.backup
+*.tfstate
+*.swp
+.terraform
+node_modules
+ddb-inserts.json

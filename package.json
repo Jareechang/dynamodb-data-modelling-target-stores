@@ -1,0 +1,16 @@
+{
+  "name": "dynamodb-data-modelling-target",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p .",
+    "build-watch": "tsc -w",
+    "dev": "yarn run build && node ./dist/index.js"
+  },
+  "devDependencies": {
+    "@common-web/ts-config": "^1.0.1",
+    "@types/node": "^14.6.0",
+    "aws-sdk": "^2.738.0"
+  }
+}

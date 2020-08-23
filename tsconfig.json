@@ -1,0 +1,15 @@
+{
+  "extends": "./node_modules/@common-web/ts-config/tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es5",
+    "outDir": "dist",
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./global.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
