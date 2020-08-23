@@ -5,7 +5,7 @@ import os
 
 query_attributes = [
     'ID',
-    'X.Locale',
+    'X.locale',
     'IsDaylightSavingsTimeRecognized',
     'Address.FormattedAddress',
     'PhoneNumber',
@@ -13,13 +13,16 @@ query_attributes = [
     'Address.PostalCode',
     'Address.City',
     'Address.AddressLine1',
-    'AllCapability'
+    'AllCapability',
+    'CVS',
+    'Starbucks',
+    'CityZip'
 ]
 
-items_to_view = 5
+items_to_view = 10
 
 # View all attributes or just query attributes (by default)
-view_all = True 
+view_all = True
 
 """
     Utility class to map the array index to the field in the csv data
@@ -101,24 +104,45 @@ class StoreData():
     def transformed(self):
         result = self.raw()
         result["AllCapability"] = self.transform_capability(result["AllCapability"])
+        # print result["AllCapability"]
         # Convert to int
         result["ID"] = int(result["ID"])
-        result["Store.StoreDistrictID"] = int(result["Store.StoreDistrictID"])
-        result["Store.StoreGroupID"] = int(result["Store.StoreGroupID"])
-        result["Store.StoreRegionID"] = int(result["Store.StoreRegionID"])
+        try:
+            result["Store.StoreDistrictID"] = int(result["Store.StoreDistrictID"])
+            result["Store.StoreGroupID"] = int(result["Store.StoreGroupID"])
+            result["Store.StoreRegionID"] = int(result["Store.StoreRegionID"])
+        except KeyError:
+            # Fail silently, when we have view_all = False, these fields don't exist
+            pass
+
+        starbucks_attr = self.get_ddb_attr(result, "Starbucks")
+        if starbucks_attr:
+            result["Starbucks"] = starbucks_attr
+
+        cvs_attr = self.get_ddb_attr(result, "CVSpharmacy")
+        if cvs_attr:
+            result["CVS"] = cvs_attr 
         # Create CityZip GSI
-        city_zip_gsi = self.createCityZipGSI(result)
+        city_zip_gsi = self.get_ddb_attr(result, "CityZip")
         if city_zip_gsi:
-            result["CityZip"] = self.createCityZipGSI(result)
+            result["CityZip"] = city_zip_gsi
 
         return result
 
-    def createCityZipGSI(self, data):
-        zip_code = data["Address.PostalCode"]
-        city = data["Address.City"]
-        if zip_code and city:
-            return "{0}#{1}".format(city, zip_code)
-        return None
+    def get_ddb_attr(self, data, gsi_type):
+        if gsi_type == "CityZip":
+            zip_code = data["Address.PostalCode"]
+            city = data["Address.City"]
+            if zip_code and city:
+                return "{0}#{1}".format(city, zip_code)
+            return None
+
+        if (gsi_type == "Starbucks"
+                or gsi_type == "CVSpharmacy"):
+                all_capability = data["AllCapability"]
+                if all_capability and gsi_type in all_capability:
+                    return 'True'
+
 
     """
     Transform to dynamoDB compatiable query data
@@ -145,7 +169,8 @@ class StoreData():
                 .replace("[", "")
                 .replace("]", "")
                 .replace(" ", "")
-                .replace("\xe9", "")
+                # re-map some 'e' characters
+                .replace("\xe9", "e")
                 .replace("\'", "")
                 .split(",")
             )
@@ -206,9 +231,9 @@ def main():
             i += 1
 
     output = transform_data(labels, working_data_set)
-    print output
-    ddb_inserts_to_csv(output)
+    # print output
     # pprint.pprint(output)
+    ddb_inserts_to_csv(output)
 
 
 if __name__ == "__main__":
