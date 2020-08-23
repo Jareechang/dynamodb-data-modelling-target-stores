@@ -19,7 +19,8 @@ query_attributes = [
     'CityZip'
 ]
 
-items_to_view = 10
+# Set to none if you want to generate file with all items
+items_to_view = None
 
 # View all attributes or just query attributes (by default)
 view_all = True
@@ -226,13 +227,17 @@ def main():
             if i == 0:
                 labels = row
 
-            if i < items_to_view and i != 0:
-                working_data_set.append(row)
+            if i != 0:
+                if items_to_view and i > items_to_view:
+                    break;
+                else:
+                    working_data_set.append(row)
+
             i += 1
 
     output = transform_data(labels, working_data_set)
     # print output
-    # pprint.pprint(output)
+    pprint.pprint("{0} entries generated.".format(len(output)))
     ddb_inserts_to_csv(output)
 
 

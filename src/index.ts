@@ -42,7 +42,24 @@ async function main() {
     const rawData = await fs.promises.readFile('./ddb-inserts.json', 'utf8');
     const results = JSON.parse(rawData);
     const ddbWrapper = new DynamoDBWrapper();
-    await ddbWrapper.batchWrite(results).catch(err => console.log(err));
+    let batchWriteEntries : Array<any> = [];
+    let entriesInserted : number = 0;
+    const operations : Array<Promise<any>> = [];
+    results.forEach(async(data: any, i: number) : Promise<void> => {
+        batchWriteEntries.push(data);
+        // Insert every 10 items batch write limit = 25 ops or < 16 mb
+        if (i % 10 === 0) {
+            operations.push(ddbWrapper.batchWrite(batchWriteEntries).catch(err => console.log(err)));
+            entriesInserted += batchWriteEntries.length
+            // Reset the entries
+            batchWriteEntries = [];
+        }
+    });
+
+    await Promise.all(operations)
+        .then((_) => {
+            console.log(`${entriesInserted} inserted into DynamoDB.`);
+        })
 }
 
 main();

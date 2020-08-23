@@ -25,29 +25,29 @@ Please note this is work in process.
 
 1. Start local DynamoDB & Create Table(for local testing)  
 
-```
+```sh
 # Start local dynamodb
 docker compose up
 
-# Create local dynamodb
-aws dynamodb create-table \
-    --endpoint-url "http://localhost:8000/" \
-    --table-name Store \
-    --attribute-definitions AttributeName=N,AttributeType=S AttributeName=Address.Subdivision,AttributeType=S \
-    --key-schema AttributeName=Address.Subdivision,KeyType=HASH AttributeName=ID,KeyType=RANGE \
-    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+# Create table using terraform 
+
+terraform plan -auto-approve -var-file=./env/local.tfvars
+
+terraform apply -auto-approve -var-file=./env/local.tfvars
 ```
+
+**Note:** `-var-file=./env/local.tfvars` points the dynamodb to the local endpoint if you want to use local dyamodb (local dev)
 
 2. Create the insert json (Using python)  
 
-```python
+```sh
 python ./scripts/generate.py
 ```
 
 3. Insert Into Table (Using Node.js)   
 
-```python
-yarn run dev
+```sh
+yarn run build && yarn run insert-db
 ```
 ## Design - Analyze Data
 
@@ -60,10 +60,10 @@ yarn run dev
 
 **Query Attributes:**
 
-- ID (string) 
+- ID (number) 
 - IsDaylightSavingsTimeRecognized (string) 
 - Address.FormattedAddress (string)
-- PhoneNumber, FaxNumber (string) 
+- PhoneNumber (string) 
 - Address.Subdivision, "state" (string) 
 - Address.City (string) 
 - AllCapability (string[])
@@ -73,7 +73,6 @@ yarn run dev
 
 - ID must be unique (Store ID)
 
-
 ## Design - DynamoDB Indexes
 
 1. Given state, return all attributes for all stores (State: WA).  
@@ -82,9 +81,9 @@ yarn run dev
 
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
-| BASE | State | ID | None (Base Table) |
+| BASE | Address.Subdivision | ID | None (Base Table) |
 
-**implementation:** `state = '<State>'`
+**Implementation:** `state = '<State>'`
 
 2. Given ID, return all attributes for store (ID: 1957)
 
@@ -92,7 +91,7 @@ Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
 | GSI | ID | Address.Subdivision | ALL |
 
-**implementation:** `ID = '<Store-ID>'`
+**Implementation:** `ID = '<Store-ID>'`
 
 3. Return all stores that do not observe daylight savings time; return just state and store ID.
 
@@ -100,45 +99,51 @@ Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
 | GSI | IsDaylightSavingsTimeRecognized | None | KEYS (Base PK/SK) |
 
-**implementation:** `IsDaylightSavingsTimeRecognized = 'TRUE' | 'FALSE'`
+**Implementation:** `IsDaylightSavingsTimeRecognized = 'TRUE' | 'FALSE'`
 
 4. Given a phone area code, return all stores with formatted addresses and phone numbers (Area Code: 206).
 
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
-| LSI | X.Locale | PhoneNumber | All |
+| LSI | X.locale | PhoneNumber | All |
 
-**implementation:** `X.Locale = '<locale>' and begins_with('(<area-code>)')`
+**Implementation:** `X.locale = '<locale>' and begins_with('(<area-code>)')`
 
-5. Return all stores that do not observe daylight savings time; return just state and store ID.
+
+5. Return all attributes for all stores with Starbucks and CVS.
+
+Index Type | PK | SK| Projections |
+------------ | -------------| -------------| -------------
+| LSI | Starbucks | CVS | KEYS (Base PK/SK) |
+
+- Add new Fields `Starbucks` ("EXISTS" or blank)
+- Add new Fields `CVS` ("EXISTS" or blank)
+
+**Note:** *For any item in a table, DynamoDB writes a corresponding index entry only if the index sort key value is present in the item.* We will leverage the sparse indexing.
 
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
 | GSI | IsDaylightSavingsTimeRecognized | None | KEYS (Base PK/SK) |
 
-**implementation:** `IsDaylightSavingsTimeRecognized = 'TRUE' | 'FALSE'`
+**Implementation:** `IsDaylightSavingsTimeRecognized = 'FALSE'`
 
-6. Return all attributes for all stores with Starbucks and CVS.
-
-Index Type | PK | SK| Projections |
------------- | -------------| -------------| -------------
-| GSI | IsDaylightSavingsTimeRecognized | None | KEYS (Base PK/SK) |
-
-7. Given state and city, return all attributes for all stores (State: WA; City: Seattle).
+6. Given state and city, return all attributes for all stores (State: WA; City: Seattle).
 
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
 | LSI | Address.Subdivision | CityZip | KEYS (Base PK/SK) |
 
-**Pre-computed key:** `Address.Subdivision` and `Address.PostalCode` named `CityZip` separated by #
+**Pre-computed key (composite key):** `Address.Subdivision` and `Address.PostalCode` named `CityZip` separated by #
 
-**implementation:** `state = '<State>' and CityZip begins_with('<city>')`
+**Implementation:** `state = '<State>' and CityZip begins_with('<city>')`
 
-8. Given state city and zip, return all attributes for all stores (State: WA; City: Seattle; Zip: 98125).
+7. Given state city and zip, return all attributes for all stores (State: WA; City: Seattle; Zip: 98125).
 
 Same as #7.
 
-**implementation:** `state = '<State>' and CityZip begins_with('<city>#<zip>')`
+**Pre-computed key (composite key):** `Address.Subdivision` and `Address.PostalCode` named `CityZip` separated by #
+
+**Implementation:** `state = '<State>' and CityZip begins_with('<city>#<zip>')`
 
 ## Design - Data Transformation 
 
@@ -146,7 +151,7 @@ Below are the final list of data we need to extract from the raw data to insert 
 
 **Query Attributes:**
 
-- ID (string) 
+- ID (number) 
 - IsDaylightSavingsTimeRecognized (string) 
 - Address.FormattedAddress (string)
 - PhoneNumber, FaxNumber (string) 
@@ -154,9 +159,21 @@ Below are the final list of data we need to extract from the raw data to insert 
 - Address.City (string) 
 - AllCapability (string[])
 - Address.PostalCode (string) 
-- X.Locale
-- `Address.Subdivision#Address.PostalCode`
+- X.locale (string)
 
-**GSI/LSI:**
+**Custom Attributes:**
 
-- CityZip 'CITY#ZIP'
+- `CitZip` - Address.Subdivision#Address.PostalCode(string)
+- `Starbucks` (string)
+- `CVS` (string)
+
+**GSI:**
+
+1. Query-By-Store-ID - PK: Address.Subdivision, SK: ID
+2. Query-By-DayLightSavings - PK: IsDaylightSavingsTimeRecognized, SK: None
+3. Query-By-Phone-Area-Code - PK: X.Locale, SK: PhoneNumber
+4. Query-By-Starbucks-And-CSV - PK: Starbucks, SK: CVS (Sparse indexing)
+
+**LSI:**
+
+5. Query-By-State-CityZip - PK: ADdress.Subdivision (by default), SK: CityZip

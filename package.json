@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -p .",
     "build-watch": "tsc -w",
-    "dev": "yarn run build && node ./dist/index.js"
+    "insert-db": "node ./dist/index.js"
   },
   "devDependencies": {
     "@common-web/ts-config": "^1.0.1",
