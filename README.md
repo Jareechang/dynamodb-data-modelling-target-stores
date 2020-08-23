@@ -7,9 +7,9 @@ Data modelling demo with DynamoDB using terraform for infrastructure management.
 
 - [Introduction](#Introdiction)
 - [Quick Start](#quick-start)
-- [Analyze Data](#design-analyze---data)
-- [DynamoDB Indexes](#design-dynamodb---indexes)
-- [Data Transformation](#design-data---transformation)
+- [Analyze Data](#design---analyze-data)
+- [DynamoDB Indexes](#design---dynamodb-indexes)
+- [Data Transformation](#design---data-transformation)
 
 ## Introduction
 
