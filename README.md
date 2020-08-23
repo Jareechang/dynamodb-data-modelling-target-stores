@@ -14,7 +14,7 @@ Please note this is work in process.
 - Given state and city, return all attributes for all stores (State: WA; City: Seattle).
 - Given state city and zip, return all attributes for all stores (State: WA; City: Seattle; Zip: 98125).
 
-#### Contents:
+#### Table Of Contents:
 
 - [Quick Start](#quick-start)
 - [Analyze Data](#design-analyze---data)
