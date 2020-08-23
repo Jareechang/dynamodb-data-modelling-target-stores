@@ -103,10 +103,10 @@ Index Type | PK | SK| Projections |
 **implementation:** `IsDaylightSavingsTimeRecognized = 'TRUE' | 'FALSE'`
 
 4. Given a phone area code, return all stores with formatted addresses and phone numbers (Area Code: 206).
+
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
-| LSI | X.Locale | PhoneNumber | ALL |
-
+| LSI | X.Locale | PhoneNumber | All |
 
 **implementation:** `X.Locale = '<locale>' and begins_with('(<area-code>)')`
 
