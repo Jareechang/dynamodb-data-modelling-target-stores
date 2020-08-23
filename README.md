@@ -68,6 +68,10 @@ python ./scripts/generate.py
 3. Insert Into Table (Using Node.js)   
 
 ```sh
+# Install packages
+yarn
+
+# Insert data into db 
 yarn run build && yarn run insert-db
 ```
 ## Design - Analyze Data
