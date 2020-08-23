@@ -89,7 +89,17 @@ Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
 | BASE | Address.Subdivision | ID | None (Base Table) |
 
-**Implementation:** `state = '<State>'`
+**AWS CLI query:**
+```sh
+aws dynamodb query \
+--endpoint-url "http://localhost:8000/" \
+--table-name Store \
+--select "COUNT" \
+--index-name "Query-By-Store-State" \
+--key-condition-express "#state = :v"  \
+--expression-attribute-names "{\"#state\":\"Address.Subdivision\"}" \
+--expression-attribute-values "{\":v\": {\"S\": \"WA\"}}"
+```
 
 2. Given ID, return all attributes for store (ID: 1957)
 
@@ -126,6 +136,24 @@ Index Type | PK | SK| Projections |
 - Add new Fields `CVS` ("EXISTS" or blank)
 
 **Note:** *For any item in a table, DynamoDB writes a corresponding index entry only if the index sort key value is present in the item.* We will leverage the sparse indexing.
+
+**AWS CLI query:**
+
+```sh
+# Change the --endpoint-url if using a different environment
+
+# Note: Remove the --select "Count" if you like to see all projections from DB
+
+aws dynamodb query \
+--endpoint-url "http://localhost:8000/" \
+--select "COUNT" \
+--table-name Store \
+--projection-expression "ID" \
+--index-name "Query-By-Starbucks-And-CSV" \
+--key-condition-express "#sb = :v and #cvs = :v"  \
+--expression-attribute-names "{\"#sb\":\"Starbucks\", \"#cvs\":\"CVS\"}" \
+--expression-attribute-values "{\":v\": {\"S\": \"True\"}}"
+```
 
 Index Type | PK | SK| Projections |
 ------------ | -------------| -------------| -------------
@@ -175,7 +203,7 @@ Below are the final list of data we need to extract from the raw data to insert 
 
 **GSI:**
 
-1. Query-By-Store-ID - PK: Address.Subdivision, SK: ID
+1. Query-By-Store-State - PK: Address.Subdivision, SK: ID
 2. Query-By-DayLightSavings - PK: IsDaylightSavingsTimeRecognized, SK: None
 3. Query-By-Phone-Area-Code - PK: X.Locale, SK: PhoneNumber
 4. Query-By-Starbucks-And-CSV - PK: Starbucks, SK: CVS (Sparse indexing)
