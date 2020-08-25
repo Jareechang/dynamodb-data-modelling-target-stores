@@ -59,6 +59,9 @@ terraform apply -auto-approve -var-file=./env/local.tfvars
 # Option 2, Env: Dev (Use a real service from AWS)
 terraform plan -var-file=./env/dev.tfvars
 terraform apply -auto-approve -var-file=./env/dev.tfvars
+
+# IMPORTANT: Remember to destroy resources after finishing with testing it otherwise you will incur charges
+terraform destroy -auto-approve -var-file=./env/dev.tfvars
 ```
 
 **Note:** `-var-file=./env/local.tfvars` points the dynamodb to the local endpoint if you want to use local dyamodb (local dev)
