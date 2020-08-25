@@ -52,9 +52,15 @@ docker compose up
 
 # Create table using terraform 
 
-terraform plan -auto-approve -var-file=./env/local.tfvars
 
+# Env: local (Mock dynamoDB)
+terraform plan -auto-approve -var-file=./env/local.tfvars
 terraform apply -auto-approve -var-file=./env/local.tfvars
+
+# Env: Dev (Use a real service from AWS)
+
+terraform plan -var-file=./env/dev.tfvars
+terraform apply -auto-approve -var-file=./env/dev.tfvars
 ```
 
 **Note:** `-var-file=./env/local.tfvars` points the dynamodb to the local endpoint if you want to use local dyamodb (local dev)
