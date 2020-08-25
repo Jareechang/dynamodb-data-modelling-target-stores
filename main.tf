@@ -1,7 +1,7 @@
 
 # Local Vars 
 locals {
-    ddb_endpoint = var.env == "local" ? var.local_ddb_endpoint : "http://dynamodb.${var.aws_region}.amazonaws.com"
+    ddb_endpoint = var.env == "local" ? var.local_ddb_endpoint : "https://dynamodb.${var.aws_region}.amazonaws.com"
     ddb_default_write_cap = 5
     ddb_default_read_cap = 5
 }
@@ -43,7 +43,7 @@ resource "aws_dynamodb_table" "target_store" {
     }
 
     attribute {
-        name = "X.Locale"
+        name = "X.locale"
         type = "S"
     }
 
@@ -97,7 +97,7 @@ resource "aws_dynamodb_table" "target_store" {
     # Given a phone area code, return all stores with formatted addresses and phone numbers (Area Code: 206).
     global_secondary_index {
         name               = "Query-By-Phone-Area-Code"
-        hash_key           = "X.Locale"
+        hash_key           = "X.locale"
         range_key          = "PhoneNumber" # Omitted range key
         write_capacity     = local.ddb_default_write_cap
         read_capacity      = local.ddb_default_read_cap
