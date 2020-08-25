@@ -52,13 +52,11 @@ docker compose up
 
 # Create table using terraform 
 
-
 # Env: local (Mock dynamoDB)
 terraform plan -auto-approve -var-file=./env/local.tfvars
 terraform apply -auto-approve -var-file=./env/local.tfvars
 
 # Env: Dev (Use a real service from AWS)
-
 terraform plan -var-file=./env/dev.tfvars
 terraform apply -auto-approve -var-file=./env/dev.tfvars
 ```
