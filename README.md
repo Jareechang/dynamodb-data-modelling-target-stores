@@ -50,13 +50,13 @@ Please note this is work in process.
 # Start local dynamodb
 docker compose up
 
-# Create table using terraform 
+# Create table using terraform (Use Option 1 or 2)
 
-# Env: local (Mock dynamoDB)
+# Option 1, Env: local (Mock dynamoDB)
 terraform plan -auto-approve -var-file=./env/local.tfvars
 terraform apply -auto-approve -var-file=./env/local.tfvars
 
-# Env: Dev (Use a real service from AWS)
+# Option 2, Env: Dev (Use a real service from AWS)
 terraform plan -var-file=./env/dev.tfvars
 terraform apply -auto-approve -var-file=./env/dev.tfvars
 ```
